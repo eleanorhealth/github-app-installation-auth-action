@@ -23,10 +23,9 @@ This action will return you your GitHub App's installation access token, which y
 
 This action returns the relevant installation token for use in subsequent steps, like [actions/github-script](https://github.com/actions/github-script)
 
-| Property          | Type      | Description                                                                                                                            |
-| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `github-token`    | `string`  | A GitHub App [installation access token](https://docs.github.com/en/rest/reference/apps#create-an-installation-access-token-for-an-app)|
-
+| Property              | Type      | Description                                                                                                                            |
+| --------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `github_app_token`    | `string`  | A GitHub App [installation access token](https://docs.github.com/en/rest/reference/apps#create-an-installation-access-token-for-an-app)|
 
 ### GitHub Workflow
 
