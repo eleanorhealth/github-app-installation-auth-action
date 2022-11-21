@@ -25,12 +25,13 @@ runs:
       with:
         python-version: '3.10'
     - name: Install Dependencies
-      run: pip install -r requirements.txt
+      run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
     - name: Fetch the number's square
       id: get-token
       run: |
-        GITHUB_APP_TOKEN=$(python src/github_app_token.py \
+        GITHUB_APP_TOKEN=$(python \
+          ${{ github.action_path }}/src/github_app_token.py \
           --direct \
           --app-id ${{ inputs.app-id }} \
           --private-key ${{ inputs.private-key }}
