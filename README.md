@@ -2,7 +2,33 @@
 
 Authenticate as a github app installation and generate a token.
 
+You will need to create a [GitHub App for authentication](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps).
+
+Once you have created an app, save the private key and app ID in secrets for the repo where you wish to run this action.
+
+This action will return you your GitHub App's installation access token, which you can in turn use to invoke other GitHub APIs.
+
 ## Usage
+
+### Input
+
+| Key                     |   Type   | Required | Description                                                                |
+| ----------------------- | :------: | :------: | -------------------------------------------------------------------------- |
+| `app-id`                | `int`    |   Yes    | Your GitHub App's id                                                       |
+| `private-key`           | `string` |   Yes    | The private key associated to the GitHub App (typically an RSA private key)|
+
+**Be sure to store your `privateKey` [as a secret](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets) in GitHub Actions!**
+
+### Output
+
+This action returns the relevant installation token for use in subsequent steps, like [actions/github-script](https://github.com/actions/github-script)
+
+| Property          | Type      | Description                                                                                                                            |
+| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `github-token`    | `string`  | A GitHub App [installation access token](https://docs.github.com/en/rest/reference/apps#create-an-installation-access-token-for-an-app)|
+
+
+### GitHub Workflow
 
 ```yaml
 ---
@@ -20,7 +46,8 @@ jobs:
         with:
           private-key: ${{ secrets.PRIVATE_KEY }}
           app-id: ${{ secrets.DEPLOYER_GITHUB_APP_ID}}
-      - configure-git:
+      - name: Configure git
+        id: configure-git
         shell: bash
         run: |
           git config --global url."https://x-access-token:${{ steps.auth-github.outputs.github_app_token }}@github.com/yourorg".insteadOf "https://github.com/yourorg"
