@@ -2,6 +2,9 @@
 ---
 name: 'github-app-installation-auth'
 description: 'Authenticate as a github app installation and generate a token'
+branding:
+  icon: lock
+  color: blue
 inputs:
   private-key:
     description: 'Github App Private Key'
