@@ -30,11 +30,10 @@ runs:
     - name: Fetch the number's square
       id: get-token
       run: |
-        GITHUB_APP_TOKEN=$(python \
-          ${{ github.action_path }}/src/github_app_token.py \
+        GITHUB_APP_TOKEN=$(${{ github.action_path }}/src/github_app_token.py \
           --direct \
-          --app-id ${{ inputs.app-id }} \
-          --private-key ${{ inputs.private-key }}
+          --app-id "${{ inputs.app-id }}" \
+          --private-key "${{ inputs.private-key }}"
         )
         echo "github_app_token=$GITHUB_APP_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
