@@ -1,6 +1,6 @@
 # Github App Installtion Auth Action
 
-Authenticate as a github app installation
+Authenticate as a github app installation and generate a token.
 
 ## Usage
 
@@ -23,5 +23,5 @@ jobs:
       - configure-git:
         shell: bash
         run: |
-          git config --global url."https://x-access-token:${{ steps.auth-github.outputs.github_app_token }}@github.com/eleanorhealth".insteadOf "https://github.com/eleanorhealth"
+          git config --global url."https://x-access-token:${{ steps.auth-github.outputs.github_app_token }}@github.com/yourorg".insteadOf "https://github.com/yourorg"
 ```
