@@ -2,3 +2,4 @@ PyJWT
 requests
 cryptography
 certifi
+charset-normalizer  # transitive dep of requests; pinned explicitly for hash verification
