@@ -52,6 +52,13 @@ def main():
 
     args = parser.parse_args()
 
+    # NOTE: The JSON-based modes (--env, --file, --inline) expect the keys
+    # "DEPLOYER_GITHUB_APP_ID" and "PRIVATE_KEY" — names inherited from the
+    # original deployment use-case. These differ from the action's own input
+    # names ("app-id" / "private-key"). The --direct mode (used by the action)
+    # avoids this naming mismatch entirely.
+    secret_json = None
+
     if args.env:
         try:
             secret_json = json.loads(os.getenv(args.env))
@@ -95,8 +102,14 @@ def main():
     print(access_token)
 
 
-def create_jwt(github_app_id: str, private_key: str, expiration: int = 10):
-    """Create a JWT bearer token for authenticating as a GitHub App"""
+def create_jwt(github_app_id: str, private_key: str, expiration: int = 10) -> str:
+    """Create a JWT bearer token for authenticating as a GitHub App.
+
+    Args:
+        github_app_id: The numeric GitHub App ID.
+        private_key: The RSA private key in PEM format.
+        expiration: Token lifetime in minutes (max 10, per GitHub's limit).
+    """
 
     time_since_epoch_in_seconds = int(time.time())
 
@@ -113,8 +126,14 @@ def create_jwt(github_app_id: str, private_key: str, expiration: int = 10):
     return encoded_payload
 
 
-def get_installation_id(jwt_bearer_token: str):
-    """Returns the installation_id of a given github app"""
+def get_installation_id(jwt_bearer_token: str) -> int:
+    """Return the installation ID of the first installation for this GitHub App.
+
+    NOTE: If the App is installed on multiple organizations or repositories,
+    this always returns the first result from the API. There is no way to
+    select a specific installation via the action inputs. If multi-installation
+    support is needed, extend this function to accept a filter (e.g. org name).
+    """
 
     headers = {
         "Authorization": f"Bearer {jwt_bearer_token}",
@@ -124,13 +143,13 @@ def get_installation_id(jwt_bearer_token: str):
     resp = requests.get(
         "https://api.github.com/app/installations", headers=headers, timeout=10
     )
+    resp.raise_for_status()
 
-    installation_id = json.loads(resp.content.decode())[0]["id"]
-    return installation_id
+    return resp.json()[0]["id"]
 
 
-def get_installation_access_token(installation_id: str, jwt_bearer_token: str):
-    """Returns an Installation Access Token for a given installation_id"""
+def get_installation_access_token(installation_id: int, jwt_bearer_token: str) -> str:
+    """Return an Installation Access Token for the given installation ID."""
 
     headers = {
         "Authorization": f"Bearer {jwt_bearer_token}",
@@ -138,15 +157,13 @@ def get_installation_access_token(installation_id: str, jwt_bearer_token: str):
     }
 
     resp = requests.post(
-        "https://api.github.com/app/installations/"
-        + str(installation_id)
-        + "/access_tokens",
+        f"https://api.github.com/app/installations/{installation_id}/access_tokens",
         headers=headers,
         timeout=10,
     )
+    resp.raise_for_status()
 
-    installation_token = json.loads(resp.content.decode())["token"]
-    return installation_token
+    return resp.json()["token"]
 
 
 if __name__ == "__main__":
